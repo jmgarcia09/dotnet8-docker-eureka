@@ -1,0 +1,39 @@
+﻿version: '3.9'
+networks:
+  app-network-public:
+    driver: bridge
+
+volumes:
+  sql-server-data:
+    driver: local
+  sqldata:
+  sqllog:
+  sqlbackup:
+
+services:
+  todoapi:
+    image: todoapi
+    networks:
+      - app-network-public
+    ports:
+      - '5248:8080'
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: 'PAdsss##221s'
+    container_name: db-sqlserver
+    networks:
+      - app-network-public
+    restart: always
+    ports:
+      - '1433:1433'
+    volumes:
+      - sql-server-data:/var/opt/mssql/
+      - sqldata:/var/opt/sqlserver/data
+      - sqllog:/var/opt/sqlserver/log
+      - sqlbackup:/var/opt/sqlserver/backup
